@@ -1,15 +1,23 @@
-import "./assets/app.css";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Row";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+import CounrtyCard from "./components/CountryCard";
+import Footer from "./components/Footer";
+import CounrtyViewer from "./pages/CountryViewer";
 
 const App = () => {
   return (
-    <Container className="mt-5">
-      <Row>
-        <Col></Col>
-      </Row>
-    </Container>
+    <>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<CounrtyCard />} />
+          <Route path="/countries:id" element={<CounrtyViewer />} />
+        </Routes>
+
+        <Footer />
+      </Router>
+    </>
   );
 };
 
