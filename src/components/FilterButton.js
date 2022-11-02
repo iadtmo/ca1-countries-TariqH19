@@ -1,28 +1,33 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Dropdown from "react-bootstrap/Dropdown";
+const FilterCountry = ({ onSelect }) => {
+  const selectHandler = (e) => {
+    const regionName = e.target.value;
+    const test = e.target.id;
+    onSelect(regionName);
+    onSelect(test);
+  };
 
-const FilterButton = () => {
   return (
-    <Container className="mt-5 ">
-      <Row>
-        <Col>
-          <Dropdown className="float-end">
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Filter By Region
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item href="#/action-1">Europe</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Africa</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Asia</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Col>
-      </Row>
-    </Container>
+    <select className="bg-dark text-light border-0" onChange={selectHandler}>
+      <option className="option" value="/all">
+        All Countries
+      </option>
+      <option className="option" value="/region/africa">
+        Africa
+      </option>
+      <option className="option" value="/region/america">
+        America
+      </option>
+      <option className="option" value="/region/asia">
+        Asia
+      </option>
+      <option className="option" value="/region/europe">
+        Europe
+      </option>
+      <option className="option" value="/region/oceania">
+        Oceania
+      </option>
+    </select>
   );
 };
 
-export default FilterButton;
+export default FilterCountry;

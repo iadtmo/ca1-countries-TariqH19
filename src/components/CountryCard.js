@@ -1,29 +1,38 @@
-import { Link } from "react-router-dom";
 import Card from "react-bootstrap/Card";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import FilterButton from "./FilterButton";
+import ListGroup from "react-bootstrap/ListGroup";
+import { Link } from "react-router-dom";
 
-const CounrtyCard = () => {
+const CountryCard = (props) => {
   return (
-    <Container className="mt-5">
-      <FilterButton />
-      <Row>
-        <Col>
-          <Card style={{ width: "18rem" }}>
-            <Card.Img variant="top" src="holder.js/100px180" />
-            <Card.Body>
-              <Card.Title>Country Name</Card.Title>
-              <Card.Text>Capital City</Card.Text>
-              <Card.Text>Language</Card.Text>
-              <Link to="/countries:id"> Find out more</Link>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+    <Card className=" border-0 p-3 bg-dark">
+      <Card.Img
+        variant="top "
+        src={props.image}
+        to={`/country/${props.name}`}
+      />
+      <Card.Body>
+        <Card.Title>
+          <Link
+            className="text-light text-decoration-none"
+            to={`/country/${props.name}`}>
+            <h3>{props.name}</h3>
+          </Link>
+        </Card.Title>
+      </Card.Body>
+      <ListGroup className="list-group-flush ">
+        <ListGroup.Item className="text-light bg-dark">
+          <p>
+            <strong>Capital:</strong> {props.capital}
+          </p>
+        </ListGroup.Item>
+        <ListGroup.Item className="text-light bg-dark">
+          <p>
+            <strong>Population:</strong> {props.population}
+          </p>
+        </ListGroup.Item>
+      </ListGroup>
+    </Card>
   );
 };
 
-export default CounrtyCard;
+export default CountryCard;

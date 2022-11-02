@@ -1,18 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
-import CounrtyCard from "./components/CountryCard";
+import Home from "./pages/Home";
 import Footer from "./components/Footer";
-import CounrtyViewer from "./pages/CountryViewer";
+import CountryViewer from "./pages/CountryViewer";
+import PageNotFound from "./pages/PageNotFound";
 
 const App = () => {
   return (
     <>
       <Router>
-        <Navbar />
+        {/* <Navbar /> */}
         <Routes>
-          <Route path="/" element={<CounrtyCard />} />
-          <Route path="/countries:id" element={<CounrtyViewer />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/country/:name" element={<CountryViewer />} />
+          <Route path="/*" element={<PageNotFound />} />
         </Routes>
 
         <Footer />
