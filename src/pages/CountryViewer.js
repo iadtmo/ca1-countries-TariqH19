@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../config/api";
+import axios from "axios";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Row";
@@ -12,12 +12,12 @@ import Form from "react-bootstrap/Form";
 const CountryViewer = () => {
   let { name } = useParams();
   let navigate = useNavigate();
-  const [country, setCountry] = useState([]);
   const [view, setView] = useState([]);
+  const [weather, setWeather] = useState([]);
   const [term, setTerm] = useState([]);
   useEffect(() => {
     axios
-      .get(`/name/${name}?fullText=true`)
+      .get(`https://restcountries.com/v3.1/name/${name}?fullText=true`)
       .then((response) => {
         setView(response.data);
       })
@@ -26,12 +26,12 @@ const CountryViewer = () => {
         navigate("/country");
       });
   });
+
   const searchCountry = () => {
     axios
-      .get(`/name/${term}`)
+      .get(`https://restcountries.com/v3.1/name/${term}`)
       .then((response) => {
-        console.log(response.data);
-        setCountry(response.data);
+        setView(response.data);
         navigate(`/country/${term}`);
       })
       .catch((error) => {
@@ -39,6 +39,22 @@ const CountryViewer = () => {
         navigate("/country");
       });
   };
+
+  const getWeather = () => {
+    axios
+      .get(
+        "http://api.weatherapi.com/v1/current.json?key=c52c6f5b80ca4b3fa91202543220611&q=London&aqi=no"
+      )
+      .then((response) => {
+        console.log(response.data);
+        setWeather(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        navigate("/country");
+      });
+  };
+
   const handleChange = (e) => {
     setTerm(e.target.value);
   };
@@ -57,7 +73,7 @@ const CountryViewer = () => {
     return (
       <>
         <ConView
-          key={i}
+          key={c.cioc}
           image={c.flags.svg}
           name={c.name.common}
           capital={c.capital}
@@ -67,9 +83,14 @@ const CountryViewer = () => {
           borders={c.borders}
           currencies={Object.values(c.currencies)[0].name}
           languages={Object.values(c.languages)}
+          maps={c.maps.openStreetMaps}
         />
       </>
     );
+  });
+
+  let weatherComponents = weather.map((w, i) => {
+    return console.log(getWeather);
   });
 
   return (
@@ -77,18 +98,12 @@ const CountryViewer = () => {
       <Container className="">
         <Row>
           <Col>
-            <h1>
-              <Link className="text-light text-decoration-none" to="/">
-                Countries
-              </Link>
-            </h1>
-          </Col>
-        </Row>
-      </Container>
-      <Container className="mt-4">
-        <Row>
-          <Col>
             <Stack direction="horizontal" gap={5}>
+              <h1>
+                <Link className="text-light text-decoration-none" to="/">
+                  Countries
+                </Link>
+              </h1>
               <Form.Control
                 className="me-auto"
                 placeholder="Search for a country here"
@@ -106,7 +121,23 @@ const CountryViewer = () => {
           </Col>
         </Row>
       </Container>
+
       {countryViewComponents}
+      {weatherComponents}
+      <Container>
+        <Row>
+          <iframe
+            title="map"
+            width="600"
+            height="500"
+            id="gmap_canvas"
+            src={`https://maps.google.com/maps?q=${name}&output=embed`}
+            frameBorder="0"
+            scrolling="no"
+            marginHeight="0"
+            marginWidth="0"></iframe>
+        </Row>
+      </Container>
     </div>
   );
 };

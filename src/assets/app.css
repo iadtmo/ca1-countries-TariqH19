@@ -3,10 +3,10 @@
     padding: 0px;
 }
 
-.blah {
+.img-resize {
     width: 100%;
-    height: 15vw;
-    object-fit: cover;
+    height: 80vh;
+    object-fit: contain;
 }
 
 .carousel .item {

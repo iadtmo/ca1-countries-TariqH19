@@ -6,7 +6,8 @@ const CountryCard = (props) => {
   return (
     <Card className=" border-0 p-3 bg-dark">
       <Card.Img
-        variant="top "
+        variant="top"
+        className="img-resize"
         src={props.image}
         to={`/country/${props.name}`}
       />
