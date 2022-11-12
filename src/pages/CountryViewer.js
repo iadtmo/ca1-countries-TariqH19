@@ -1,3 +1,4 @@
+//imports
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -9,27 +10,66 @@ import Stack from "react-bootstrap/Stack";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
+//component for country show/view page
 const CountryViewer = () => {
+  //variable containing the name of the country
   let { name } = useParams();
+  //helps navigate to relevant page
   let navigate = useNavigate();
   const [view, setView] = useState([]);
   const [weather, setWeather] = useState([]);
+
   const [term, setTerm] = useState([]);
   useEffect(() => {
-    axios
-      .get(`https://restcountries.com/v3.1/name/${name}?fullText=true`)
-      .then((response) => {
-        setView(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-        navigate("/country");
-      });
-  });
+    // axios
+    //   .get(`https://restcountries.com/v3.1/name/${name}?fullText=true`)
+    //   .then((response) => {
+    //     setView(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     navigate("/country");
+    //   });
+    fetchData();
+  }, []);
 
+  //function that gets data from both api's
+  const fetchData = () => {
+    const countriesApi = `https://restcountries.com/v3.1/name/${name}?fullText=true`;
+    const weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=${name}&units=metric&appid=69821fba627343c0ee5dbba4c6f0d779`;
+
+    const getCountries = axios.get(countriesApi);
+    const getWeather = axios.get(weatherApi);
+    Promise.allSettled([getCountries, getWeather])
+      .then(
+        //gets the data using spread operator
+        axios.spread((...allData) => {
+          // console.log(allData[0]);
+          const allDataCountries = allData[0].value.data;
+          const allDataweather = allData[1].value;
+          setView(allDataCountries);
+
+          // console.log(allDataweather);
+          //if there is weather data set the weather
+          if (allDataweather) {
+            setWeather([allDataweather.data]);
+          }
+          // // setWeather(allDataweather);
+          // if (allData[1].data) {
+          //   setWeather([allData[1].data]);
+          // }
+          // // console.log(allData[1].data);
+        })
+      )
+      .catch((e) => {
+        // console.log(e);
+      });
+  };
+
+  //searching for a country
   const searchCountry = () => {
     axios
-      .get(`https://restcountries.com/v3.1/name/${term}`)
+      .get(`https://restcountries.com/v3.1/name/${term}?fullText=true`)
       .then((response) => {
         setView(response.data);
         navigate(`/country/${term}`);
@@ -40,14 +80,17 @@ const CountryViewer = () => {
       });
   };
 
-  const getWeather = () => {
+  //searching for the weather
+  const searchWeather = () => {
     axios
       .get(
-        "http://api.weatherapi.com/v1/current.json?key=c52c6f5b80ca4b3fa91202543220611&q=London&aqi=no"
+        `https://api.openweathermap.org/data/2.5/weather?q=${term}&units=metric&appid=69821fba627343c0ee5dbba4c6f0d779`
       )
       .then((response) => {
-        console.log(response.data);
-        setWeather(response.data);
+        setWeather([response.data]);
+        if (response.data) {
+          setWeather([response.data]);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -61,36 +104,49 @@ const CountryViewer = () => {
 
   const handleClick = (e) => {
     searchCountry();
+    searchWeather();
   };
 
   const handleOnKeyUp = (e) => {
     if (e.key === "Enter") {
       searchCountry();
+      //searchWeather();
     }
   };
 
-  let countryViewComponents = view.map((c, i) => {
+  //mapping through all countries
+  let countryViewComponents = view?.map((c, index) => {
     return (
-      <>
-        <ConView
-          key={c.cioc}
-          image={c.flags.svg}
-          name={c.name.common}
-          capital={c.capital}
-          population={c.population.toLocaleString()}
-          region={c.region}
-          timezones={c.timezones}
-          borders={c.borders}
-          currencies={Object.values(c.currencies)[0].name}
-          languages={Object.values(c.languages)}
-          maps={c.maps.openStreetMaps}
-        />
-      </>
+      <ConView
+        key={index}
+        image={c.flags.svg}
+        name={c.name.common}
+        capital={c.capital}
+        population={c.population.toLocaleString()}
+        region={c.region}
+        timezones={c.timezones}
+        borders={c.borders}
+        currencies={Object.values(c.currencies)[0]?.name}
+        languages={Object.values(c.languages)}
+      />
     );
   });
 
-  let weatherComponents = weather.map((w, i) => {
-    return console.log(getWeather);
+  //mapping through all weather data
+  let weatherComponents = weather?.map((w, index) => {
+    // console.log(w);
+    return (
+      <WeatherConView
+        key={index}
+        temp={w.main.temp}
+        ltemp={w.main.temp_min}
+        humidity={w.main.humidity}
+        icon={w.weather[0].icon}
+        main={w.weather[0].description}
+        wind={w.wind.speed}
+        wname={w.name}
+      />
+    );
   });
 
   return (
@@ -124,20 +180,6 @@ const CountryViewer = () => {
 
       {countryViewComponents}
       {weatherComponents}
-      <Container>
-        <Row>
-          <iframe
-            title="map"
-            width="600"
-            height="500"
-            id="gmap_canvas"
-            src={`https://maps.google.com/maps?q=${name}&output=embed`}
-            frameBorder="0"
-            scrolling="no"
-            marginHeight="0"
-            marginWidth="0"></iframe>
-        </Row>
-      </Container>
     </div>
   );
 };
@@ -245,6 +287,97 @@ const ConView = (props) => {
             </Col>
           </Stack>
         </Row>
+      </Container>
+    </>
+  );
+};
+
+const WeatherConView = (props) => {
+  return (
+    <>
+      <Container className="mt-5 pb-5 text-light">
+        <Row>
+          <Col>
+            <h1 className="text-center text-light mb-5">How is the weather</h1>
+          </Col>
+        </Row>
+
+        <Stack direction="horizontal">
+          <Col>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <h3 className="">{props.wname}</h3>
+                  <img
+                    src={`http://openweathermap.org/img/wn/${props.icon}@2x.png`}
+                    alt=""
+                  />
+                </Stack>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <p>
+                    <strong>Temperature:</strong>
+                  </p>
+                  <p className="ms-2">{props.temp} celcius</p>
+                </Stack>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <p>
+                    <strong>Humidity:</strong>
+                  </p>
+                  <p className="ms-2">{props.humidity}</p>
+                </Stack>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <p>
+                    <strong>Lowest Temperature:</strong>
+                  </p>
+                  <p className="ms-2">{props.ltemp} celcius</p>
+                </Stack>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <p>
+                    <strong>Wind Speed:</strong>
+                  </p>
+                  <p className="ms-2">{props.wind} kph</p>
+                </Stack>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Stack direction="horizontal">
+                  <p>
+                    <strong>Conditions:</strong>
+                  </p>
+                  <p className="ms-2">{props.main}</p>
+                </Stack>
+              </Col>
+            </Row>
+          </Col>
+
+          <iframe
+            title="map"
+            width="1000"
+            height="300"
+            id="gmap_canvas"
+            src={`https://maps.google.com/maps?q=${props.wname}&output=embed`}
+            frameBorder="0"
+            scrolling="no"
+            marginHeight="0"
+            marginWidth="0"></iframe>
+        </Stack>
       </Container>
     </>
   );

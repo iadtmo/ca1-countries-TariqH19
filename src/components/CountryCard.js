@@ -1,7 +1,9 @@
+//imports
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import { Link } from "react-router-dom";
 
+//component to display countries using cards
 const CountryCard = (props) => {
   return (
     <Card className=" border-0 p-3 bg-dark">

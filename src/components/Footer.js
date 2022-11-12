@@ -1,6 +1,8 @@
+//imports
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
+//Footer
 const Footer = () => {
   return (
     <Row className="m-0 p-5 text-center text-light bg-dark ">

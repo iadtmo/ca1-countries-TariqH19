@@ -1,3 +1,4 @@
+//imports
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Container from "react-bootstrap/Container";
@@ -11,12 +12,14 @@ import { Link } from "react-router-dom";
 import Loading from "../components/Loading";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 
+//Home Component
 const Home = () => {
   const [country, setCountry] = useState([]);
   const [filteredCountry, setFilteredCountry] = useState([]);
   const [term, setTerm] = useState([]);
   useEffect(() => {
     axios
+      //countries api call
       .get("https://restcountries.com/v3.1/all")
       .then((response) => {
         setCountry(response.data);
@@ -24,6 +27,8 @@ const Home = () => {
       })
       .catch((error) => console.log(error));
   }, []);
+
+  //search function searching by country name
   const searchCountry = () => {
     axios
       .get(`https://restcountries.com/v3.1/name/${term}`)
@@ -45,9 +50,11 @@ const Home = () => {
     searchCountry();
   };
 
+  //mapping through all countries
   let countryComponents = filteredCountry.map((c, i) => {
     return (
       <CountryCard
+        //data from the api to be displayed in the countrycard component
         key={i}
         image={c.flags.svg}
         name={c.name.common}
@@ -57,6 +64,7 @@ const Home = () => {
     );
   });
 
+  //filtering through the counties and returning the countries in a specific region
   const handleSelect = (event) => {
     if (event === "all") {
       setFilteredCountry(country);
@@ -69,6 +77,7 @@ const Home = () => {
     }
   };
 
+  //filtering through the counties and returning the countries that have a population less than a given number
   const handlePopSelect = (event) => {
     if (event === "all") {
       setFilteredCountry(country);
@@ -81,6 +90,7 @@ const Home = () => {
     }
   };
 
+  //how we search for a country
   const handleSearch = (event) => {
     setTerm(event.target.value);
 
@@ -100,15 +110,17 @@ const Home = () => {
     }
   };
 
+  // a variable that is equal to filtered countries
   const handleSort = (event) => {
     let sorted = [...filteredCountry];
 
+    //sorting through the filteredCountry array and storing it in the sorted vairable
     sorted.sort((a, b) => {
-      if (a.population < b.population) {
+      if (a.population > b.population) {
         return -1;
       }
 
-      if (a.population > b.population) {
+      if (a.population < b.population) {
         return 1;
       }
 
@@ -119,6 +131,7 @@ const Home = () => {
   };
 
   return (
+    //bootstrap to display countries
     <div className="bg-dark">
       <Container className="">
         <Row>
